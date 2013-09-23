@@ -48,8 +48,8 @@ public class MerchantProcessorBolt extends BaseRichBolt {
 			tuple = (MerchantTuple)obj;			
 		}
 		System.out.println("msgID:" + msgID.toString() + ", tuple:" + tuple.toString());
-		
-		collector.ack(input);
+		if (!tuple.accNo.equals("103"))
+			collector.ack(input);
 	}
 
 	@Override

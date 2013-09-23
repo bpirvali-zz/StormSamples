@@ -79,7 +79,7 @@ public class MerchantFeederSpout extends BaseRichSpout {
 			MerchantTuple merchantTuple = null;
 			while(i<toProcessMerchants.size()) {
 				merchantTuple = new MerchantTuple(toProcessMerchants.get(i), bcdStart);
-				System.out.printf("emitting:%s...\n", merchantTuple.toString());
+				System.out.printf("emitting[%d]:%s...\n", i, merchantTuple.toString());
 				collector.emit(new Values(merchantTuple), merchantTuple);
 				i++;
 			}

@@ -17,8 +17,10 @@ public final class Utilities {
 			// open the file
 			input = Utilities.class.getResourceAsStream( fileName );
 			BufferedReader reader = new BufferedReader(new InputStreamReader(input));
-			while((line = reader.readLine()) != null){ 
-				l.add(line.trim());
+			while((line = reader.readLine()) != null) {
+				line = line.trim();
+				if (line.length()>0)
+					 l.add(line);
 			}			
 		} catch (FileNotFoundException e) {
 			throw new RuntimeException("FileNotFoundException: ["+fileName+"]");

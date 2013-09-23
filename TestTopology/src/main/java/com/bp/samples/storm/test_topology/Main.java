@@ -47,8 +47,8 @@ public class Main {
 		conf.put(AppConsts.MERCHANTS_FILE, args[0]);
 		conf.put(AppConsts.BCD_START, args[1]);
 		conf.put(AppConsts.BCD_END, args[2]);
-		conf.put(Config.TOPOLOGY_MAX_SPOUT_PENDING, 1);
-		conf.setDebug(true);
+		conf.put(Config.TOPOLOGY_MAX_SPOUT_PENDING, 100);
+		conf.setDebug(false);
         //Topology run
 		
 		// build the topology
@@ -64,7 +64,7 @@ public class Main {
 		
 		// create cluster 
 		LocalCluster cluster = new LocalCluster();
-		cluster.submitTopology("Count-Word-Toplogy-With-Refresh-Cache", conf, builder.createTopology());
+		cluster.submitTopology("Merchant-Batch-Processing-Topology", conf, builder.createTopology());
 		System.out.println("Sleeping for 5 secs...");
 		Thread.sleep(5000);
 		System.out.println("Shuting down the cluster...");
