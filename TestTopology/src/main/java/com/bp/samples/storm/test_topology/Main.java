@@ -6,7 +6,7 @@ import backtype.storm.Config;
 import backtype.storm.LocalCluster;
 import backtype.storm.topology.TopologyBuilder;
 
-import com.bp.samples.storm.test_topoology.spouts.MerchantFeederSpout;
+import com.bp.samples.storm.test_topology.spouts.MerchantFeederSpout;
 
 public class Main {
 

@@ -1,4 +1,4 @@
-package com.bp.samples.storm.test_topoology.spouts;
+package com.bp.samples.storm.test_topology.spouts;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
