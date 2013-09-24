@@ -48,6 +48,8 @@ public class Main {
 		conf.put(AppConsts.BCD_START, args[1]);
 		conf.put(AppConsts.BCD_END, args[2]);
 		conf.put(Config.TOPOLOGY_MAX_SPOUT_PENDING, 100);
+		conf.put(Config.TOPOLOGY_ENABLE_MESSAGE_TIMEOUTS, true);
+		conf.put(Config.TOPOLOGY_MESSAGE_TIMEOUT_SECS, 5);
 		conf.setDebug(false);
         //Topology run
 		
@@ -65,8 +67,8 @@ public class Main {
 		// create cluster 
 		LocalCluster cluster = new LocalCluster();
 		cluster.submitTopology("Merchant-Batch-Processing-Topology", conf, builder.createTopology());
-		System.out.println("Sleeping for 5 secs...");
-		Thread.sleep(5000);
+		System.out.println("Sleeping for 50 secs...");
+		Thread.sleep(50000);
 		System.out.println("Shuting down the cluster...");
 		cluster.shutdown();
 	}

@@ -119,6 +119,7 @@ public class MerchantFeederSpout extends BaseRichSpout {
     @Override
     public void fail(Object msgId) {
 		System.out.println("FAIL:"+msgId);
+		
     }
 
 	/**
