@@ -57,16 +57,18 @@ public class MerchantFeederSpout extends BaseRichSpout {
 		topologyCtx 	= context;
 		this.collector 	= collector;
 
-		
-		// config override
 		bcdStart = getBCDStart();
 		bcdEnd = getBCDEnd();
 		System.out.println("BCD Start:" + bcdStart);
 		System.out.println("BCD End:" + bcdEnd);
 		
-		
 		// get the Merchants
 		toProcessMerchants = getMerchantAccNoList(mapStormConfig.get(AppConsts.MERCHANTS_FILE).toString());
+		
+		System.out.println("Spout: getThisComponentId:" + context.getThisComponentId());
+		System.out.println("Spout: getThisTaskId:" + context.getThisTaskId());
+		System.out.println("Spout: getThisTaskIndex:" + context.getThisTaskIndex());
+		
 	}
 
 	@Override
@@ -87,6 +89,7 @@ public class MerchantFeederSpout extends BaseRichSpout {
 		} else {
 			// just sleep
 			try {
+				System.out.printf("Sleeping in the spout[%d], Thread-ID=[%d]\n", topologyCtx.getThisTaskIndex(), Thread.currentThread().getId());
 				Thread.sleep(1000);
 			} catch (InterruptedException e) {
 				//Do nothing

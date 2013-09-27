@@ -34,19 +34,25 @@ public class MerchantProcessorBolt extends BaseRichBolt {
 		mapStormConfig 	= stormConf;
 		topologyCtx 	= context;
 		this.collector 	= collector;
+		
+		System.out.println("Bolt: getThisComponentId:" + context.getThisComponentId());
+		System.out.println("Bolt: getThisTaskId:" + context.getThisTaskId());
+		System.out.println("Bolt: getThisTaskIndex:" + context.getThisTaskIndex());
 
 	}
-
+	
 	@Override
 	public void execute(Tuple input) {
-		
-		MessageId msgID = input.getMessageId();
+		// check the object type!
 		Object obj = input.getValue(0);
-		obj = input.getValueByField("MerchantTuple");
-		MerchantTuple tuple = null;
-		if (obj instanceof MerchantTuple) {
-			tuple = (MerchantTuple)obj;			
-		}
+		if (!(obj instanceof MerchantTuple))
+			throw new RuntimeException("inpub tuple:[" + obj.toString()  +  "] not instance of MerchantTuble");
+		if (obj!=input.getValueByField("MerchantTuple"))
+			throw new RuntimeException("obj!=input.getValueByField");
+		
+		MerchantTuple tuple = (MerchantTuple)obj;					
+		MessageId msgID = input.getMessageId();
+			
 		System.out.println("msgID:" + msgID.toString() + ", tuple:" + tuple.toString());
 		if (!tuple.accNo.equals("103"))
 			collector.ack(input);
