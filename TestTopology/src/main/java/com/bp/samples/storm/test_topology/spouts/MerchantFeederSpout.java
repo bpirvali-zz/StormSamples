@@ -1,5 +1,6 @@
 package com.bp.samples.storm.test_topology.spouts;
 
+import java.io.File;
 import java.util.List;
 import java.util.Map;
 
@@ -89,7 +90,8 @@ public class MerchantFeederSpout extends BaseRichSpout {
 		} else {
 			// just sleep
 			try {
-				System.out.printf("Sleeping in the spout[%d], Thread-ID=[%d]\n", topologyCtx.getThisTaskIndex(), Thread.currentThread().getId());
+				System.out.printf("Sleeping in the spout[%d], Thread-ID=[%d]\n", 
+						topologyCtx.getThisTaskIndex(), Thread.currentThread().getId());
 				Thread.sleep(1000);
 			} catch (InterruptedException e) {
 				//Do nothing
@@ -131,6 +133,18 @@ public class MerchantFeederSpout extends BaseRichSpout {
 	 * @return
 	 */
 	public static List<String> getMerchantAccNoList(String fileName) {
+//		System.out.println("Looking for file:" + fileName);
+//		//return Utilities.getLinesFromFileAsResource(fileName);
+//		File f = new File(fileName);
+//		if (!f.exists()) 
+//			System.out.println("Waiting for file:" + fileName);
+//		while (!f.exists()) {
+//			try {
+//				Thread.sleep(5000);
+//			} catch (InterruptedException e) {
+//																																																																																																														e.printStackTrace();
+//			}
+//		}
 		return Utilities.getLinesFromFile(fileName);
 	}
 	
