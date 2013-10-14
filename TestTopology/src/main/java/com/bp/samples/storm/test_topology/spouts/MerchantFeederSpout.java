@@ -1,8 +1,10 @@
 package com.bp.samples.storm.test_topology.spouts;
 
-import java.io.File;
 import java.util.List;
 import java.util.Map;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import backtype.storm.spout.SpoutOutputCollector;
 import backtype.storm.task.TopologyContext;
@@ -24,6 +26,7 @@ import com.bp.samples.storm.test_topology.Utilities;
  */
 public class MerchantFeederSpout extends BaseRichSpout {
 	private static final long serialVersionUID = 1;		
+	private static final Logger logger = LoggerFactory.getLogger(MerchantFeederSpout.class);
 	
 	@SuppressWarnings("rawtypes") 
 	private Map mapStormConfig = null;
@@ -60,15 +63,19 @@ public class MerchantFeederSpout extends BaseRichSpout {
 
 		bcdStart = getBCDStart();
 		bcdEnd = getBCDEnd();
-		System.out.println("BCD Start:" + bcdStart);
-		System.out.println("BCD End:" + bcdEnd);
+		logger.trace("BCD Start:" + bcdStart);
+		logger.trace("BCD End:" + bcdEnd);
+		logger.info("-------------------");
+		logger.info("user.dir:" + System.getProperty("user.dir"));
+		logger.info("-------------------");
 		
 		// get the Merchants
-		toProcessMerchants = getMerchantAccNoList(mapStormConfig.get(AppConsts.MERCHANTS_FILE).toString());
+		toProcessMerchants = getMerchantAccNoList(topologyCtx.getThisTaskIndex(), 
+				mapStormConfig.get(AppConsts.MERCHANTS_FILE).toString());
 		
-		System.out.println("Spout: getThisComponentId:" + context.getThisComponentId());
-		System.out.println("Spout: getThisTaskId:" + context.getThisTaskId());
-		System.out.println("Spout: getThisTaskIndex:" + context.getThisTaskIndex());
+		logger.trace("Spout: getThisComponentId:" + context.getThisComponentId());
+		logger.trace("Spout: getThisTaskId:" + context.getThisTaskId());
+		logger.trace("Spout: getThisTaskIndex:" + context.getThisTaskIndex());
 		
 	}
 
@@ -82,15 +89,18 @@ public class MerchantFeederSpout extends BaseRichSpout {
 			MerchantTuple merchantTuple = null;
 			while(i<toProcessMerchants.size()) {
 				merchantTuple = new MerchantTuple(toProcessMerchants.get(i), bcdStart);
-				System.out.printf("emitting[%d]:%s...\n", i, merchantTuple.toString());
+				logger.trace("Spout[{}]:emitting[{}]:{}...", topologyCtx.getThisTaskIndex(), i, merchantTuple.toString());
+				
 				collector.emit(new Values(merchantTuple), merchantTuple);
 				i++;
 			}
 			toProcessMerchants.clear();
 		} else {
 			// just sleep
+			//2013-10-06 13:46:20,138 [Thread-35] TRACE com.bp.samples.storm.test_topology.spouts.MerchantFeederSpout (MerchantFeederSpout.java:97)  - Sleeping in the spout[%d], Thread-ID=[%d]
+			//%d [%t] %-5p %C (%F:%L) %x - %m%n
 			try {
-				System.out.printf("Sleeping in the spout[%d], Thread-ID=[%d]\n", 
+				logger.trace("Sleeping in the spout[{}], Thread-ID=[{}]", 
 						topologyCtx.getThisTaskIndex(), Thread.currentThread().getId());
 				Thread.sleep(1000);
 			} catch (InterruptedException e) {
@@ -118,13 +128,12 @@ public class MerchantFeederSpout extends BaseRichSpout {
     
     @Override
     public void ack(Object msgId) {
-		System.out.println("ACK:"+msgId);    
+		logger.trace("Spout[{}]:ACK:{}", topologyCtx.getThisTaskIndex(), msgId);    
 	}
     
     @Override
     public void fail(Object msgId) {
-		System.out.println("FAIL:"+msgId);
-		
+		logger.trace("Spout[{}]:FAIL:{}", topologyCtx.getThisTaskIndex(), msgId);    
     }
 
 	/**
@@ -132,12 +141,12 @@ public class MerchantFeederSpout extends BaseRichSpout {
 	 * 
 	 * @return
 	 */
-	public static List<String> getMerchantAccNoList(String fileName) {
-//		System.out.println("Looking for file:" + fileName);
+	public static List<String> getMerchantAccNoList(int workerID, String fileName) {
+//		logger.trace("Looking for file:" + fileName);
 //		//return Utilities.getLinesFromFileAsResource(fileName);
 //		File f = new File(fileName);
 //		if (!f.exists()) 
-//			System.out.println("Waiting for file:" + fileName);
+//			logger.trace("Waiting for file:" + fileName);
 //		while (!f.exists()) {
 //			try {
 //				Thread.sleep(5000);
@@ -145,7 +154,8 @@ public class MerchantFeederSpout extends BaseRichSpout {
 //																																																																																																														e.printStackTrace();
 //			}
 //		}
-		return Utilities.getLinesFromFile(fileName);
+		return Utilities.getLinesFromFile(workerID, fileName);
+		//return Utilities.getLinesFromFileAsResource(workerID, fileName);
 	}
 	
 	/**

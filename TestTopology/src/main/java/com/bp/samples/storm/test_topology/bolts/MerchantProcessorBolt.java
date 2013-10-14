@@ -2,6 +2,9 @@ package com.bp.samples.storm.test_topology.bolts;
 
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
@@ -19,6 +22,7 @@ import com.bp.samples.storm.test_topology.MerchantTuple;
  */
 public class MerchantProcessorBolt extends BaseRichBolt {
 	private static final long serialVersionUID = 1L;
+	private static final Logger logger = LoggerFactory.getLogger(MerchantProcessorBolt.class);
 	
 	@SuppressWarnings("rawtypes") 
 	private Map mapStormConfig = null;
@@ -29,15 +33,15 @@ public class MerchantProcessorBolt extends BaseRichBolt {
 	@Override
 	public void prepare(Map stormConf, TopologyContext context,
 			OutputCollector collector) {
-		System.out.println("entering prepare...");
+		logger.trace("entering prepare...");
 		// save input 
 		mapStormConfig 	= stormConf;
 		topologyCtx 	= context;
 		this.collector 	= collector;
 		
-		System.out.println("Bolt: getThisComponentId:" + context.getThisComponentId());
-		System.out.println("Bolt: getThisTaskId:" + context.getThisTaskId());
-		System.out.println("Bolt: getThisTaskIndex:" + context.getThisTaskIndex());
+		logger.trace("Bolt: getThisComponentId:" + context.getThisComponentId());
+		logger.trace("Bolt: getThisTaskId:" + context.getThisTaskId());
+		logger.trace("Bolt: getThisTaskIndex:" + context.getThisTaskIndex());
 
 	}
 	
@@ -53,7 +57,7 @@ public class MerchantProcessorBolt extends BaseRichBolt {
 		MerchantTuple tuple = (MerchantTuple)obj;					
 		MessageId msgID = input.getMessageId();
 			
-		System.out.println("msgID:" + msgID.toString() + ", tuple:" + tuple.toString());
+		logger.trace("msgID:" + msgID.toString() + ", tuple:" + tuple.toString());
 		if (!tuple.accNo.equals("103"))
 			collector.ack(input);
 		//else
@@ -62,7 +66,7 @@ public class MerchantProcessorBolt extends BaseRichBolt {
 
 	@Override
 	public void declareOutputFields(OutputFieldsDeclarer declarer) {
-		System.out.println("entering declareOutputFields...");
+		logger.trace("entering declareOutputFields...");
 	}
 
 }

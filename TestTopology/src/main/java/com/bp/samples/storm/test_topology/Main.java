@@ -1,10 +1,17 @@
 package com.bp.samples.storm.test_topology;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
+//import org.apache.log4j.Level;
+//import org.apache.log4j.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 
 import backtype.storm.Config;
 import backtype.storm.LocalCluster;
+import backtype.storm.StormSubmitter;
+import backtype.storm.generated.AlreadyAliveException;
+import backtype.storm.generated.InvalidTopologyException;
 import backtype.storm.topology.TopologyBuilder;
 
 import com.bp.samples.storm.test_topology.bolts.MerchantProcessorBolt;
@@ -44,15 +51,8 @@ import com.bp.samples.storm.test_topology.spouts.MerchantFeederSpout;
 		cluster.shutdown();
  */
 public class Main {
-	static Logger logger = Logger.getRootLogger();
+	private static final Logger logger = LoggerFactory.getLogger(Main.class);
 	public static void main(String[] args) throws InterruptedException {
-	      logger.setLevel((Level) Level.WARN);
-	      logger.debug("Here is some DEBUG");
-	      logger.info("Here is some INFO");
-	      logger.warn("Here is some WARN");
-	      logger.error("Here is some ERROR");
-	      logger.fatal("Here is some FATAL");
-	      
         //Configuration
 		Config conf = new Config();
 		
@@ -61,10 +61,10 @@ public class Main {
 		
 		// enable reliable messaging
 		conf.put(Config.TOPOLOGY_ENABLE_MESSAGE_TIMEOUTS, true);
-		conf.put(Config.TOPOLOGY_MESSAGE_TIMEOUT_SECS, 5);
+		conf.put(Config.TOPOLOGY_MESSAGE_TIMEOUT_SECS, 600);
 		
 		// set debug to false
-		conf.setDebug(false);
+		conf.setDebug(true);
 		
 		// Customize config with my own data
 		conf.put(AppConsts.MERCHANTS_FILE, args[0]);
@@ -72,30 +72,46 @@ public class Main {
 		conf.put(AppConsts.BCD_END, args[2]);
 		
 		// set no of workers
-		conf.setNumWorkers(3);
+		conf.setNumWorkers(AppConsts.NO_WORKERS);
 		
 		// build the topology
 		TopologyBuilder builder = new TopologyBuilder();
 		
 		// set the parallelism hint to two --> 1 spout / worker process
-		builder.setSpout("MerchantFeederSpout", new MerchantFeederSpout(), 3);
+		builder.setSpout("MerchantFeederSpout", new MerchantFeederSpout(), AppConsts.NO_SPOUTS);
 		
 		// set the parallelism hint to four --> 2 bolts / worker process
-		builder.setBolt("MerchantProcessorBolt", new MerchantProcessorBolt(), 6).shuffleGrouping("MerchantFeederSpout");		
+		builder.setBolt("MerchantProcessorBolt", new MerchantProcessorBolt(), AppConsts.NO_BOLTS).shuffleGrouping("MerchantFeederSpout");		
 		
-		//System.out.println("user.dir:" + System.getProperty("user.dir"));
+		logger.info("-------------------");
+		logger.info("user.dir:" + System.getProperty("user.dir"));
+		logger.info("-------------------");
 		//List<String> list = MerchantFeederSpout.getMerchantAccNoList(conf.get(AppConsts.MERCHANTS_FILE).toString());
 		//for (String l:list)
 		//	System.out.println(l);
 		//System.exit(0);
 		
-		// create cluster 
+		// -----------------------
+		// create local cluster 
+		// -----------------------
+		/*
 		LocalCluster cluster = new LocalCluster();
-		cluster.submitTopology("Merchant-Batch-Processing-Topology", conf, builder.createTopology());
-		System.out.println("Sleeping for 50 secs...");
+		cluster.submitTopology("Risk-Events-Topology", conf, builder.createTopology());
+		logger.info("Sleeping for 50 secs...");
 		Thread.sleep(50000);
-		System.out.println("Shuting down the cluster...");
+		logger.info("Shuting down the cluster...");
 		cluster.shutdown();
+		*/
+		
+		// -------------------------------
+		// submit to distributed cluster
+		// -------------------------------
+		try {
+			StormSubmitter.submitTopology("Risk-Events-Topology", conf, builder.createTopology());
+		} catch (AlreadyAliveException e) {
+			e.printStackTrace();
+		} catch (InvalidTopologyException e) {
+			e.printStackTrace();
+		}			
 	}
-
 }

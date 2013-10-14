@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public final class Utilities {
-	public static List<String> getLinesFromFileAsResource(String fileName) {
+	public static List<String> getLinesFromFileAsResource(int workerID, String fileName) {
 		InputStream input = null;
 		List<String> l = new ArrayList<String>();
 		String line;
@@ -18,10 +18,12 @@ public final class Utilities {
 			// open the file
 			input = Utilities.class.getResourceAsStream( fileName );
 			BufferedReader reader = new BufferedReader(new InputStreamReader(input));
+			int i=0;
 			while((line = reader.readLine()) != null) {
 				line = line.trim();
-				if (line.length()>0)
+				if (line.length()>0 && (i % 4)==workerID  )
 					 l.add(line);
+				i++;
 			}			
 		} catch (FileNotFoundException e) {
 			throw new RuntimeException("FileNotFoundException: ["+fileName+"]");
@@ -38,7 +40,7 @@ public final class Utilities {
 		return l;
 	}
 	
-	public static List<String> getLinesFromFile(String fileName) {
+	public static List<String> getLinesFromFile(int workerID, String fileName) {
 		//InputStream input = null;
 		BufferedReader reader = null;
 		List<String> l = new ArrayList<String>();
@@ -46,10 +48,13 @@ public final class Utilities {
 		try {
 			// open the file
 			reader = new BufferedReader(new FileReader(fileName));
+			int i=0;
 			while((line = reader.readLine()) != null) {
 				line = line.trim();
-				if (line.length()>0)
+				if (line.length()>0 && (i % 4)==workerID  )
+				//if (line.length()>0)
 					 l.add(line);
+				i++;
 			}			
 		} catch (FileNotFoundException e) {
 			throw new RuntimeException("FileNotFoundException: ["+fileName+"]");
@@ -65,5 +70,4 @@ public final class Utilities {
 		}
 		return l;
 	}
-
 }
